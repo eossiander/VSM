@@ -1,0 +1,1455 @@
+\chapter{Huffing deaths}
+
+{\bf Abstract}
+
+\begin{quote}
+Background: Volatile substance misuse (VSM) causes some deaths, but because there are no specific cause-of-death codes for VSM, these deaths are rarely tabulated. 
+
+Methods: We used the textual cause-of-death information on death certificates to count VSM-associated deaths that occurred in Washington State during 2003--2012. 
+
+Findings: There were 56 deaths involving VSM in Washington State during 2003--2012. VSM deaths occurred primarily among males (87.5\%) and whites (92.9\%). Most deaths occurred in people age 20 or older (91.1\%). Difluoroethane was named on 30 death certificates (53.6\%), and its involvement increased during the study period. Gas duster products were named as the source of difluoroethane for 12 deaths; no source was named for the other 18 difluoroethane deaths.
+
+Conclusions: Most VSM deaths occurred among white male adults, and gas duster products containing difluoroethane were a primary source of inhalants.
+\end{quote}
+
+\section{Introduction}
+
+Volatile substance misuse (VSM) , also known as ``huffing'' or ``sniffing,'' is usually defined as the inhalation of vapors from volatile substances with the intent of getting high, but not including the inhalation of illicit drugs such as cocaine or marijuana~\cite{Williams-2007}. VSM is common among young people in the US, with an estimated 12--15\% of 8th graders having used an inhalant at least once~\cite{Garland-2011,Howard-2011,Lorenc-2003}, and is also a common drug use problem in other countries~\cite{Dell-2011a,Hynes-Dowell-2011}. 
+Unusual among drug use problems, the definition of VSM refers to the route of administration, rather than the substances that are used. A wide variety of substances are used---a study of Poison Center reports in the US found 3,400 different products used in VSM cases between 1993 and 2008~\cite{Marsolek-2010}.
+
+VSM deaths cannot be easily identified in death records. The International Classification of Disease (ICD) codes which are used for coding cause of death have codes for many of the substances used in VSM, but not for the method by which the substance was administered~\cite{WHO-ICD-10}. For example, ICD codes would not distinguish an incident in which a factory worker was accidentally exposed to toluene vapors at work from a VSM incident in which a person inhaled toluene to get high. For this reason, there are few estimates of the number of deaths associated with VSM. Three studies have used either medical examiner files~\cite{Bowen-1999,Hall-2010} or a manual review of death certificates~\cite{Maxwell-2001} to count VSM deaths in individual states. The National Poison Data System tabulates VSM deaths each year, but Poison Center reporting is voluntary, and is not thought to provide a good count of deaths~\cite{Marsolek-2010}.
+
+The SuperMICAR computer system has been used for coding cause-of-death in the U.S. since about 2000 (the system was not implemented at the same time in all states; Washington State, from which we drew data for this study, began using it in 2003). With the SuperMICAR system, vital records staff key in the literal cause-of-death entry as it appears on the death certificate, and the computer system assigns ICD codes to describe the death (human coders are still used for some records)~\cite{Glenn-1999}. The text of the cause-of-death portion of the certificate is stored in a computer file with the ICD codes, and can be used for analysis~\cite{Ossiander-2014a}. In the present study, we used the textual cause-of-death entries to search for deaths in which there were words that suggested VSM deaths. Then we manually reviewed the entire text of those certificates to classify the deaths as being associated with VSM or not.
+
+The purpose of the present study was to count the number of deaths associated with VSM in Washington State between 2003 and 2012, and to describe the characteristics of those deaths, including the substances used, the assigned cause of death, and the demographic characteristics of the decedents.
+
+\section{Methods}
+
+We obtained death certificate data, including the cause-of-death text, for all deaths occurring in Washington State between 2003 and 2012. Because the inhalation of volatile substances may sometimes contribute to deaths that are coded to other underlying causes~\cite{Garriott-1992}, we did not restrict our analysis to those classified as poisoning deaths. We used the ICD codes for underlying cause-of-death to exclude suicides, as those decedents were not using volatile substances to get high, but we included deaths of undetermined intent.
+
+Methods for using the textual cause-of-death data are more completely described in a previous paper~\cite{Ossiander-2014a}. Briefly, these data include the text of the entries on  the cause-of-death portion of the death certificate, including the immediate and underlying causes of death, other conditions contributing to the death, and the description of how the injury occurred, for deaths in which there was an injury. We combined these entries, then parsed them into separate words or phrases. We searched the entries for words that could suggest the inhalation of a volatile substance, by searching for the words and word roots listed in \autoref{wordlist}. We listed the death certificates identified in the search,  manually reviewed their entire cause-of-death information, and classified them as involving VSM or not involving VSM.
+
+\begin{table}
+\begin{minipage}{0.4\textwidth}
+\caption{\label{wordlist}List of words and word roots that were used to search for VSM deaths.}
+\begin{tabular}{l} \hline
+aerosol		    \\
+amyl nitrate	    \\
+bag    		    \\
+butane		    \\
+canned air	    \\
+chloroethane	    \\
+clean  		    \\ 
+compressed air	    \\
+compressed nitrogen \\
+difluoroethane	    \\
+difluoromethane	    \\
+duster		    \\
+ethyl chloride	    \\
+gasoline	    \\
+gasoline vapors     \\
+glue		    \\
+huff   		    \\
+inert gas  	    \\
+inhal   	    \\
+nitrous oxide	    \\
+popp   		    \\
+sniff   	    \\
+toluene		    \\
+volatile 	    \\
+whipped		    \\
+\hline
+\end{tabular}
+\end{minipage}
+\end{table}
+
+After identifying the deaths that were associated with VSM, we conducted a descriptive analysis of them. We tabulated the inhalation method, the substances that were inhaled, the age, sex, and race of the decedents, the intent (unintentional or undetermined), and the presence of other medical conditions or drugs as either the main cause or contributors to the death.
+
+This research used records from non-living subjects only, and was determined to be exempt from human subjects review.
+
+\begin{detail}
+In previous work, I looked at the SuperMICAR data only for deaths with an underlying cause
+of drug dependence or poisoning. Here I want to look at all deaths, so I create entirely
+separate programs for combining the SuperMICAR data and regular death data, and for parsing
+the words. See the program \autoref{huffing.sas}.
+\end{detail}
+
+\section{Results}
+
+\begin{detail}
+
+Numbers of huffing deaths.
+
+\begin{lstlisting}[language=sas,caption='Count numbers of deaths']
+libname sm     'c:\data\poisoning\SuperMICAR';
+libname death  'c:\data\death';
+/*
+First count numbers of deaths occurring in Washington between 2003 and 2012
+*/
+data all;
+   set death.dea2003 death.dea2004 death.dea2005 death.dea2006 death.dea2007
+       death.dea2008 death.dea2009 death.dea2010 death.dea2011 death.dea2012;
+   keep dth_yr cnty_occ;
+run;
+proc freq data=all;
+   tables cnty_occ;
+run;
+/*
+There were 485758 deaths, 9756 not in Washington, so 476,002 occurred in Washington
+
+Now tabulate the huffing deaths
+*/
+proc freq data=sm.huffextractconfirmed;
+   where cnty_occ ne '00';
+   tables confirmed;
+run;
+/*
+results
+                           15:17 Tuesday, January 7, 2014  23
+
+                        The FREQ Procedure
+
+                                        Cumulative    Cumulative
+  confirmed    Frequency     Percent     Frequency      Percent
+  --------------------------------------------------------------
+  D                   5        2.13             5         2.13
+  N                 160       68.09           165        70.21
+  P                   5        2.13           170        72.34
+  S                  14        5.96           184        78.30
+  Y                  51       21.70           235       100.00
+*/
+
+proc format;
+   value ageten
+       0-9  = ' 0-9 '
+      10-19 = '10-19'
+      20-29 = '20-29'
+      30-39 = '30-39'
+      40-49 = '40-49'
+      50-59 = '50-59'
+      60-120= '60+'
+      ;
+   value $white
+      '1' = 'white'
+      other = 'all other'
+      ;
+run;
+options ls=80;
+proc freq data=sm.huffdeaths;
+   tables sex age race;
+   tables year/out=yeartab(rename=(count=deaths));
+   format age ageten.;
+run;
+/*
+Label deaths as involving difluoroethane or not, so they can be tabulated
+*/
+data difl;
+   length difl_flag $ 1;
+   set sm.huffdeaths;
+   array words{75} $ 35 worda1-worda75;
+   difl_flag = 'N';
+   do i = 1 to 75;
+      if words{i} = 'DIFLUOROETHANE' then do;
+         difl_flag = 'Y';
+         output;
+         return;
+         end;
+      end;
+   output;
+run;
+proc freq data=difl noprint;
+   tables year*difl_flag/out=diflcount;
+run;
+data difla(rename=(count=difl));
+   set diflcount(where=(difl_flag='Y'));
+run;
+data diflb(rename=(count=notdifl));
+   set diflcount(where=(difl_flag='N'));
+run;
+data counts(drop=difl_flag percent);
+   merge yeartab difla diflb;
+   by year;
+   if difl = . then difl = 0;
+   if notdifl = . then notdifl = 0;
+run;
+ 
+data _null_;
+   set counts;
+   file "c:\user\poisoning\supermicar\analysis\huffcount.dat";
+   if _n_ = 1 then put "year deaths difl notdifl";
+   put year deaths difl notdifl;
+run;
+/*
+results
+                                       11:19 Wednesday, February 5, 2014
+
+                       The FREQ Procedure
+
+                              Sex
+
+                                    Cumulative    Cumulative
+    SEX    Frequency     Percent     Frequency      Percent
+    --------------------------------------------------------
+    F             7       12.50             7        12.50
+    M            49       87.50            56       100.00
+
+
+                          Age in years
+
+                                     Cumulative    Cumulative
+     AGE    Frequency     Percent     Frequency      Percent
+   ----------------------------------------------------------
+   10-19           5        8.93             5         8.93
+   20-29          14       25.00            19        33.93
+   30-39          12       21.43            31        55.36
+   40-49          16       28.57            47        83.93
+   50-59           8       14.29            55        98.21
+   60+             1        1.79            56       100.00
+
+
+                             Race
+
+                                    Cumulative    Cumulative
+   RACE    Frequency     Percent     Frequency      Percent
+   ---------------------------------------------------------
+   1             52       92.86            52        92.86
+   3              2        3.57            54        96.43
+   C              1        1.79            55        98.21
+   D              1        1.79            56       100.00
+
+
+                        The SAS System                                2
+                                       17:06 Thursday, February 6, 2014
+
+                      The FREQ Procedure
+
+                        Year of death
+
+                                   Cumulative    Cumulative
+  Year    Frequency     Percent     Frequency      Percent
+  ---------------------------------------------------------
+  2003           1        1.79             1         1.79
+  2004           5        8.93             6        10.71
+  2005           3        5.36             9        16.07
+  2006           4        7.14            13        23.21
+  2007           3        5.36            16        28.57
+  2008           6       10.71            22        39.29
+  2009           3        5.36            25        44.64
+  2010          15       26.79            40        71.43
+  2011           6       10.71            46        82.14
+  2012          10       17.86            56       100.00
+
+*/
+\end{lstlisting}
+
+Inhalation method: there does not seem to be enough detail on most of the records to tabulate this. I think I will just list pertinent details for all 56 records in a table.
+
+\begin{lstlisting}[language=sas,caption='death listing']
+proc print data=sm.huffdeaths;
+   var year age sex underly linea lineb linec lined lineother descrip place;
+run;
+data _null_;
+   set sm.huffdeaths;
+   put year age sex underly confirmed linea / lineb "* " linec / lined "* " lineother / 
+       descrip "* " place / "-----------------";
+run;
+
+\end{lstlisting}
+
+Death listing 
+
+\bfs
+\bvm
+2003 41 M X44 Y
+ASPHYXIA DUE TO NITROUS OXIDE OXYGEN DISPLACEMENT, PROBABLE NITROUS OXIDE TOXICI
+TY
+  *
+  * ARTERIOSCLEROSIS OF CORONARY ARTERIES
+INHALATION OF NITROUS OXIDE * BONNEY LAKE
+-----------------
+2004 56 M F191 Y PULMONARY FIBROSIS
+CHRONIC DESQUAMATIVE INTERSTITIAL PNEUMONITIS * ILLICIT INHALED SUBSTANCE ABUSE
+  *
+  *
+-----------------
+2004 26 M X47 Y ASPHYXIA AND PROBABLE CARDIAC ARRHYTHMIA
+INHALATION OF TOXIC VOLATILE COMPOUND, DIFLUOROETHANE *
+  * PROBABLE POSITIONAL ASPHYXIA
+INHALED TOXIC VOLATILE COMPOUND * INSIDE PORTO POTTY
+-----------------
+2004 44 M Y20 Y ASPHYXIA
+PLASTIC BAG OVER HEAD *
+  *
+ACUTE INTOXICATION DUE TO COMBINED EFFECTS OF METHAMPHETAMINE, DIFLUOROETHANE AN
+D ETHYL CHLORIDE
+FOUND WITH PLASTIC BAG OVER HEAD * HOME
+-----------------
+2004 51 M I251 P CORONARY ATHEROSCLEROTIC HEART DISEASE
+HEAVY DOSE OF INHALED HYDROCARBONS *
+  *
+  *
+-----------------
+2004 20 M X49 Y PROBABLE CARDIAC ARRHYTHMIA
+INHALATION OF AEROSOL, DIFLUOROETHANE *
+  *
+APPARENT INHALATION OF AEROSOL, DUST OFF * HOME
+-----------------
+2005 28 M X44 Y PROBABLE CARDIAC DYSRHYTHMIA
+DUE TO NITROUS OXIDE AND POLYPHARMACY DRUG *
+EFFECT , MORPHINE, VALIUM, SERTRALINE
+  *
+COMBINATION OF INHALATION NITROUS AND INGESTING MEDICATION * HOME
+-----------------
+2005 33 M X44 Y ASPHYXIAL INHALATION OF ETHYL CHLORIDE
+  *
+  *
+RECREATIONAL INHALATION OF ETHYL CHLORIDE * HOME
+-----------------
+2005 29 M F101 Y ACUTE ALCOHOL AND DIFLUOROETHANE INTOXICATION
+  *
+  *
+NON INTENTIONAL , SELF ADMINISTERED OVERDOSE OF ALCOHOL AND DUST OFF. * HOME
+-----------------
+2006 43 M I250 P ASCVD
+  *
+  * BUTANE TOXICITY
+EXPOSURE TO BUTANE VAPOR * HOME
+-----------------
+2006 15 M X47 Y GASOLINE VAPOR TOXICITY
+  *
+  *
+INHALATION, HUFFING, OF GASOLINE VAPOR * HOME
+-----------------
+2006 18 M X47 P PROBABLE ACUTE BUTANE INTOXICATION
+  *
+  *
+INHALED BUTANE * PARKED VEHICLE ON STREET
+-----------------
+2006 33 M X46 Y DIFLUOROETHENE INTOXICATION
+  *
+  *
+INHALANT ABUSE, HUFFING * HOME
+-----------------
+2007 16 F X46 Y DROWNING
+DIFLUOROETHANE INTOXICATION *
+  *
+DECEASED INHALED DIFLUOROETHANE, DUST OFF, AND DROWN IN HOT TUB * HOME
+-----------------
+2007 56 M X46 P TOXIC ASPHYXIA
+INHALATION OF VOLATILE SOLVENTS INCLUDING TOLUENE *
+  *
+INHALED SOLVENTS IN ENCLOSED SPACE * HOME
+-----------------
+2007 22 M X46 Y COMBINED ETHANOL AND DIFLUROMETHANE INTOXICATION
+  *
+  *
+TOXIC USE OF ALCOHOL AND AN INHALANT * HOME
+-----------------
+2008 34 M X46 Y ACUTE ETHANOL AND DIFLUOROETHANE INTOXICATION
+  *
+  *
+INGESTED ETHANOL AND INHALED DIFLUORETHANE * HOME
+-----------------
+2008 50 M X46 Y DIFLUOROETHANE POISONING
+  *
+  *
+INHALATION OF PROPELLANT FROM CANNED AIR. * DECEDENT'S RESIDENCE
+-----------------
+2008 36 M X44 Y ACUTE COMBINED CHLOROETHANE AND ETHANOL INTOXICATION
+  *
+  * NARCOLEPSY
+TOXIC USE OF VOLATILE INHALANTS AND ETHANOL * BATHHOUSE
+-----------------
+2008 36 M W83 Y ASPHYXIA
+PLASTIC BAG OVER HEAD WITH INHALATION OF NITROUS OXIDE *
+  *
+INHALATIONAL ABUSE OF NITROUS OXIDE * SCIENCE BUILDING
+-----------------
+2008 42 M X44 Y
+ASPHYXIA DUE TO INHALANT ABUSE, ETHYL CHLORIDE WITH GAS MASK OVER HEAD
+  *
+  *
+ABUSING ETHYL CHLORIDE AS AN INHALANT WITH GAS MASK OVER HEAD * HOME
+-----------------
+2008 41 M I499 Y BRONCHOPNEUMONIA AND ANOXIC ENCEPHALOPATHY
+PROBABLE ACUTE CARDIAC DYSRHYTHMIA ASSOCIATED WITH AMYL NITRATE *
+INHALATION ABUSE IN COMBINATION WITH ACUTE ETHANOL INTOXICATION
+  *
+ABUSE OF AMYL NITRATE WHILE INTOXICATED WITH ETHANOL * BUSINESS
+-----------------
+2009 50 M X44 Y ACUTE ETHYL CHLORIDE INTOXICATION
+  *
+  *
+INHALANT ABUSE OF ETHYL CHLORIDE CONTAINING SOLVENT * WORK SITE
+-----------------
+2009 15 F W80 Y RESPIRATORY ARREST
+ASPHYXIA * HUFFING, INHALATION
+SUBSTANCE ABUSE *
+HUFFING FROM AEROSOL CAN. * HOME
+-----------------
+2009 45 M X44 Y COMBINED OXYCODONE AND DIFLUORETHANE INTOXICATION
+  *
+  *
+PRESCRIPTION MEDICATION AND INHALANT ABUSE * RESIDENCE
+-----------------
+2010 23 M X46 Y
+POSITIONAL ASPHYXIA DUE TO LOSS OF CONSCIOUSNESS DUE TO 1, 1-DIFLUOROETHANE (DYN
+AX COMPRESSED GAS DUSTER) INTOXICATION
+  *
+  * MORBID OBESITY
+1, 1-DIFLUOROETHANE INTOXICATION * RESIDENCE
+-----------------
+2010 21 M X47 Y ASPHYXIA
+PROPANE INHALATION AND PLASTIC BAG OVER HEAD *
+  *
+SELF ADMINISTERED, INTENTIONAL PROPANE INHALATION * DECEDENT'S HOME
+-----------------
+2010 46 M X48 Y PROBABLE CARDIAC DYSRHYTHMIA
+INHALATION OF DIFLUROETHANE *
+  *
+INTENTIONALLY INHALED DUST DESTROYER * RESIDENCE
+-----------------
+2010 36 F X48 Y DIFLUOROETHANE POISONING
+  *
+  * ISCHEMIC HEART DISEASE, PRESCRIPTION DRUG USE
+HUFFING DUST REMOVER * RESIDENCE
+-----------------
+2010 51 M Y19 Y PROBABLE ASPHYXIA FROM INHALING AEROSOL
+  *
+  *
+INHALED FUMES FROM AEROSOL CANS (WHIPPED CREAM) * RESIDENCE
+-----------------
+2010 44 M X43 Y ASPHYXIA
+INHALATION OF DIFLUORETHANE *
+  * EMPHYSEMA
+ENGAGED IN (HUFFING) THE ACT OF INHALATION OF COMPRESSED AIR *
+DECEDENTS RESIDENCE
+-----------------
+2010 34 M X47 Y ACUTE DIFLUOROETHANE INTOXICATION
+  *
+  *
+ACUTE DRUG INTOXICATION * HOME
+-----------------
+2010 34 M X41 Y SUDDEN CARDIAC ARREST, DUE TO CHEMICAL
+INHALATION AND DRUG TOXICITY * DRUGS TAKEN CHLORDIAZEPOXIDE AND NORDIAZEPAM
+  *
+DECEDENT TOOK ANTI DEPRESSANTS AND WAS HUFFING OR INHALING CANNED AIR, CHEMICAL
+WAS DICHLOROMETHANE * HOME
+-----------------
+2010 39 F X48 Y ASPHYXIA
+INHALATION OF DIFLUOROETHANE *
+  *
+INHALATION OF AEROSOL DUST REMOVER * HOME
+-----------------
+2010 35 F X46 P ACUTE TOLUENE TOXICITY
+  *
+  *
+INHALED CHEMICALS CONTAINING TOLUENE * HOME
+-----------------
+2010 29 M X44 Y DIFLUOROETHANE INTOXICATION
+  *
+  * HEPATIC STEATOSIS
+INHALANT ABUSE * RESIDENCE
+-----------------
+2010 13 M X48 Y CARDIOTOXICITY
+DUE TO AEROSOL INHALANT ABUSE (DIFLUORETHANE) *
+  *
+DECEDENT WAS HUFFING OR INHALING AEROSOL CANNED AIR * FRIENDS RESIDENCE
+-----------------
+2010 46 M X49 Y ASPHYXIA
+INHALATION OF AEROSOL FROM HUFFING *
+  *
+INHALATION OF AEROSOL FROM COMPRESSED AIR CAN * RESIDENCE
+-----------------
+2010 51 M X44 Y ACUTE TRAMADOL AND POSSIBLE INHALANT INTOXICATION
+  *
+  * HYPERTENSIVE CARDIOVASCULAR DISEASE
+TOXIC USE OF DRUGS * RESIDENCE
+-----------------
+2010 29 M X49 Y PROBABLE CARDIAC DYSRHYTHMIA
+FLUORINATED HYDROCARBON TOXICITY (DIFLUOROETHANE) *
+  *
+INHALATION (HUFFING) OF AEROSOL COMPUTER KEYBOARD CLEANER * OUTSIDE
+-----------------
+2011 23 M X44 Y ASPHYXIATION
+  *
+  *
+DECEDENT SECURED OVER HIS HEAD A PLASTIC BAG CONNECTED TO A HOSE CONNECTED TO TH
+E OPENED VALVE OF A HELIUM TANK * VEHICLE ON PROPERTY OF RESIDENCE
+-----------------
+2011 46 F X47 Y DIFLUORETHANE POISONING
+  *
+  *
+HUFFED INHALANT * RESIDENCE
+-----------------
+2011 43 M X47 Y ACUTE DIFLUOROETHANE INTOXICATION
+  *
+  *
+INHALANT ABUSE * RESIDENCE
+-----------------
+2011 45 M W18 Y ACUTE SUBDURAL HEMATOMA
+BLUNT FORCE INJURY OF HEAD *
+  * ACUTE DIFLUOROETHANE INTOXICATION
+GROUND LEVEL FALL WHILE INTOXICATED BY HUFFING DIFLUOROETHANE * PARK
+-----------------
+2011 22 M X44 Y
+ACUTE INTOXICATION DUE TO THE COMBINED EFFECTS OF DIFLUOROETHANE;
+DOXYLAMINE; DEPHEHYDRAMINE; TRAZODONE; CITALOPRAM; HYDROCODONE; AND ETHANOL *
+  *
+TOXIC USE OF DRUGS AND INHALANT ABUSE (DIFLUOROETHANE) * RESIDENCE
+-----------------
+2011 45 M X47 Y ACUTE DIFLUOROETHANE INTOXICATION
+  *
+  *
+INHALANT ABUSE * HOME
+-----------------
+2012 29 M X47 Y DIFLUOROETHANE POISONING
+INHALATION OF COMPRESSED AIR DUSTER *
+  * SEIZURE DISORDER
+INHALATION OF COMPRESSED AIR DUSTER * RESIDENCE
+-----------------
+2012 40 M X44 Y PROBABLE CARDIAC ARRHYTHMIA
+INHALANT ABUSE OF DIFLUOROETHANE *
+  * CHRONIC ALCOHOL ABUSE
+INHALATION OF "DUST OFF" COMPRESSED AIR * RESIDENCE
+-----------------
+2012 55 M X47 Y ACUTE DIFLUOROETHANE TOXICITY
+  *
+  *
+INHALED DIFLUOROETHANE * RESIDENCE
+-----------------
+2012 33 M V475 Y MULTIPLE BLUNT FORCE INJURIES
+  *
+  * HUFFING DIFLUOROETHANE
+DRIVER OF SINGLE VEHICLE ACCIDENT * PUBLIC ROADWAY
+-----------------
+2012 44 F X47 Y ACUTE DIFLUOROETHANE INTOXICATION
+  *
+  *
+INHALANT ABUSE * HOME
+-----------------
+2012 49 M X44 Y CHLOROETHANE INTOXICATION
+  *
+  *
+INHALANT ABUSE * HOTEL/MOTEL
+-----------------
+2012 35 M X47 Y ACUTE DIFLUOROETHANE INTOXICATION
+  *
+  * REPORTED HISTORIES OF DEPRESSION AND SUBSTANCE ABUSE
+INHALATION OF DIFLUOROETHANE (HUFFING) * DECEDENTS RESIDENCE
+-----------------
+2012 25 M X44 Y
+ACUTE INTOXICATION DUE TO THE COMBINED EFFECTS OF ETHANOL; DIFLUOROETHANE; DIAZE
+PAM; DIFLUOROETHANE; OXAZEPAM; TEMAZEPAM
+S/P LARGE BOWEL RESECTION WITH HEALED ILEORECTAL ANASTOMOSIS *
+DILATED PELVIS OF THE LEFT KIDNEY
+  *
+OVER USE OF MEDICATION * RESIDENCE
+-----------------
+2012 63 M X49 Y CARDIAC ARRHYTHMIA
+TOXIC INGESTION * INTENTIONAL INHALATION OF AEROSOL FUMES
+  *
+INTENTIONAL INHALATION OF AEROSOL FUMES * DECEDENTS HOME
+-----------------
+2012 24 M X47 Y ACUTE DIFLUOROETHANE INTOXICATION WITH PROBABLE ASPHYXIA
+  *
+  *
+INHALANT ABUSE WITH PLASTIC BAG OVER HEAD * RESIDENCE
+-----------------
+
+
+Summarized list:
+2003 41 M X44  asphyxia due to nitrous oxide inhalation
+2004 56 M F191 pulmonary fibrosis/interstitial pneumonitis due to illicit inhaled substance abuse
+2004 26 M X47  asphyxia due to inhalation of difluoroethane
+2004 44 M Y20  asphyxia/plastic bag over head/combined effects of methamphetamine, difluoroethane, and ethyl chloride
+2004 51 M I251 atherosclerotic heart disease; heavy dose of inhaled hydrocarbons
+2004 20 M X49  inhalation of difluoroethane; Dust-Off
+2005 28 M X44  nitrous oxide and morphine, valium, and sertraline
+2005 33 M X44  asphyxia from recreational inhalation of ethyl chloride
+2005 29 M F101 acute alcohol and difluoroethane (Dust-Off) intoxication
+2006 43 M I250 atherosclerotic coronary disease and butane vapor toxicity
+2006 15 M X47  huffing of gasoline vapor
+2006 18 M X47  inhaled butane
+2006 33 M X46  huffing difluoroethene
+2007 16 F X46  inhaled difluoroethane (Dust-Off) and drowned in hot tub
+2007 56 M X46  asphyxia due to inhalation of volatile solvents including toluene
+2007 22 M X46  ethanol and difluoromethane intoxication
+2008 34 M X46  ethanol and difluoroethane intoxication
+2008 50 M X46  difluoroethance poisoning/inhalation of propellant from canned air
+2008 36 M X44  combined chloroethane and ethanol intoxication
+2008 36 M W83  asphyxia/plastic bag over head/inhalation of nitrous oxide
+2008 42 M X44  asphyxia/ethyl chloride with gas mask over head
+2008 41 M I499 cardiac dysrhythmia associated with amyl nitrate inhalation abuse/ethanol intoxication
+2009 50 M X44  inhalant abuse of ethyl chloride-containing solvent
+2009 15 F W80  asphyxia/huffing from aerosol can
+2009 45 M X44  oxycodone and difluoroethane intoxication/inhalant abuse
+2010 23 M X46  positional asphyxia/1,1-difluoroethane (dynex compressed gas duster)
+2010 21 M X47  asphyxia/propane inhalation and plastic bag over head
+2010 46 M X48  cardiac dysrhythmia/inhalation of difluroethane/dust destroyer
+2010 36 F X48  difluoroethane poisoning/huffing dust remover
+2010 51 M Y19  asphyxia from inhaling fumes from aerosol cans (whipped cream)
+2010 44 M X43  asphyxia due to inhalation of difluorethane
+2010 34 M X47  acute difluoroethane intoxication
+2010 34 M X41  chlordiazepoxide and nordiazepam/huffing canned air (dichloromethane)
+2010 39 F X48  asphyxia/inhalation of difluoroethane/aerosol dust remover
+2010 35 F X46  inhaled chemicals containing toluene 
+2010 29 M X44  difluoroethane intoxication/inhalant abuse
+2010 13 M X48  cardiotoxicity/aerosol inhalant abuse (difluoroethane)/huffing canned air
+2010 46 M X49  asphyxia/huffing aerosol from compressed air can
+2010 51 M X44  tramadol and possible inhalant intoxication
+2010 29 M X49  cardiac dysrhythmia/difluoroethane/huffing computer keyboard cleaner 
+2011 23 M X44  asphyxiation/plastic bag over head, connected to helium tank 
+2011 46 F X47  difluorethane poisoning/huffed inhalant
+2011 43 M X47  difluoroethane intoxication/inhalant abuse
+2011 45 M W18  acute subdural hematoma/head injury/fell while huffing difluoroethane
+2011 22 M X44  combined effects of difluoroethane, doxylamine, diphenhydramine, trazodone, citalopram, hydrocodone, and ethanol
+2011 45 M X47  difluoroethane intoxication/inhalant abuse
+2012 29 M X47  difluoroethane poisoning/inhalation of compressed air duster
+2012 40 M X44  cardiac arrhythmia/inhalant abuse of difluoroethane/Dust-Off
+2012 55 M X47  inhaled difluoroethane 
+2012 33 M V475 multiple blunt force injuries/huffing difluoroethane/driver, single vehicle accident
+2012 44 F X47  difluoroethane intoxication/inhalant abuse
+2012 49 M X44  chloroethane intoxication/inhalant abuse
+2012 35 M X47  difluoroethane intoxication/huffing
+2012 25 M X44  combined effects of ethanol, difluoroethane, diazepam, oxazepam, temazepam
+2012 63 M X49  cardiac arrhythmia/inhalation of aerosol fumes
+2012 24 M X47  difluoroethane intoxication/inhalant abuse with plastic bag over head
+
+\end{verbatim}
+\efs
+
+Count method, substance, other drugs, intent, other conditions.
+
+method counted from table: can't count---not enough detail. But 4 mentioned a plastic bag over the head, and one mentioned a gas mask.
+
+Difluoroethane, with no other drugs except alcohol mentioned, was variously coded to \\
+X43  1          (1)\\
+X44  11         (2)\\
+X46  111111     (6)\\
+X47  111111111  (9)\\
+X48  111        (3)\\
+X49  11         (2)\\
+F101 1          (1)\\
+W18  1          (1)\\
+V475 1          (1)
+
+nine different causes (including the 1 fall, 1 MVA, and 1 alcohol psychiatric code).
+
+Substances mentioned:\\
+difluoroethane                                          111111111111111111111111111111  (30) \\
+difluoromethane                                         1                                (1) \\
+gasoline                                                1                                (1) \\
+chloroethane (aka ethyl chloride)                       111111                           (6) \\
+dichloromethane                                         1                                (1) \\
+helium                                                  1                                (1) \\
+nitrous oxide                                           111                              (3) \\
+butane                                                  11                               (2) \\
+toluene                                                 11                               (2) \\
+difluoroethene                                          1                                (1) \\
+amyl nitrate                                            1                                (1) \\
+propane                                                 1                                (1) \\
+hydrocarbons (NOS)                                      1                                (1) \\
+aerosol fumes or can (NOS)                              111                              (3) \\
+compressed or canned air (chemical not specified)       1                                (1) \\
+inhalant abuse, or similar, no substance mentioned      11                               (2) \\
+more than one inhaled chemical mentioned (number named) 2                                (1) 
+
+\begin{tabular{llr}
+difluoroethane          &111111111111111111111111111111  & 30 \\
+chloroethane (ethyl chl &111111  &  6 \\
+nitrous oxide           &111  &  3 \\
+aerosol fumes or can, n &1111  &  4 \\
+butane                  &11  &  2 \\
+toluene                 &11  &  2 \\
+inhalant abuse or use,  &11  &  2 \\
+difluoroethene          &1   & 1 \\
+amyl nitrate            &1  &  1 \\
+dichloromethane         &1  &  1 \\
+difluoromethane         &1  &  1 \\
+gasoline                &1  &  1 \\
+helium                  &1  &  1 \\
+propane                 &1  &  1 \\
+hydrocarbons, not other &1  &  1 \\
+compressed or canned ai &  &  0 \\
+\end{tabular}
+
+12 different chemicals were named on 50 certificates (6 certificates named only `hydrocarbons,' aerosol fumes or cans, compressed or canned air, or inhalant use). Difluoroethane was by far the most commonly mentioned chemical, named on 31 certificates. Chloroethane (also known as ethyl chloride) was named on 6 certificates (one named both difluoroethane and chloroethane), nitrous oxide was named on 3, and no other substance was named more than twice.
+
+Tabulate intent:
+\begin{lstlisting}[language=sas,caption=tabulate intent]
+libname sm     'c:\data\poisoning\SuperMICAR';
+libname death  'c:\data\death';
+proc freq data=sm.huffdeaths
+   tables underly;
+run;
+/*
+results
+            The SAS System     16:18 Thursday, January 16, 2014  46
+
+                        The FREQ Procedure
+
+                Underlying cause of death (4 dgt)
+
+                                       Cumulative    Cumulative
+   UNDERLY    Frequency     Percent     Frequency      Percent
+   ------------------------------------------------------------
+   F101              1        1.79             1         1.79
+   F191              1        1.79             2         3.57
+   I250              1        1.79             3         5.36
+   I251              1        1.79             4         7.14
+   I499              1        1.79             5         8.93
+   V475              1        1.79             6        10.71
+   W18               1        1.79             7        12.50
+   W80               1        1.79             8        14.29
+   W83               1        1.79             9        16.07
+   X41               1        1.79            10        17.86
+   X43               1        1.79            11        19.64
+   X44              14       25.00            25        44.64
+   X46               8       14.29            33        58.93
+   X47              13       23.21            46        82.14
+   X48               4        7.14            50        89.29
+   X49               4        7.14            54        96.43
+   Y19               1        1.79            55        98.21
+   Y20               1        1.79            56       100.00
+*/
+\end{lstlisting}
+
+In broad categories, I count these as 
+
+\begin{tabular}{lr}
+category        & count \\ \hline
+drug use/dependence        &  2 \\
+disease                    &  3 \\
+unintentional poisoning    & 45 \\
+other unintentional injury &  4 \\
+undetermined intent        &  2 \\ 
+\hline
+\end{tabular}
+
+There were 22 deaths where the only cause mentioned was inhalation and the only substance mentioned was difluoroethane (this includes asphyxia deaths, but not the drowning, the MVA, or any death with another drug, even alcohol, mentioned, or any death with underlying cause of a disease). Among these 22 deaths, the underlying code was as follows:
+
+X43     1           1  \\
+X44     11          2  \\
+X45                    \\
+X46     111         3  \\
+X47     1111111111 10  \\
+X48     1111        4  \\
+X49     11          2  
+
+{\bf Other demographics---education, occupation, rural/urban, etc}
+
+\begin{lstlisting}[language=sas,caption=other demographics]
+libname sm 'c:\data\poisoning\supermicar';
+proc format;
+   value educ
+      1 = '8th grade or less'
+      2 = '9th-12th grade, no diploma'
+      3 = 'High school graduate or GED'
+      4,5 = 'Some college'
+      6 = 'Bachelor''s degree'
+      7,8 = 'Postgraduate degree'
+      .,9,99  = 'Unknown (09 or 99)'
+      ;
+   value $occclass
+      '000' - '196' = 'professional/technical'
+      '200' - '222','387' = 'farmer'
+      '249' - '298' = 'manager/proprietor/official'
+      '301' - '370' = 'clerical'
+      '380'-'386','388'-'396' = 'sales'
+      '400' - '559' = 'craftsmen/foremen/kindred'
+      '600' - '726' = 'operatives'
+      '810' - '892' = 'service workers'
+      '901'-'907','960'-'986' = 'laborers'
+      '   ','908','909','995'-'999' = 'other'
+      ;
+run;
+/*
+there is one huffing death in 2003, when a different education coding was used,
+so we recode their educ value before tabulating (that person was coded as a
+high school graduate)
+*/
+data huffeduc;
+   set sm.huffdeaths;
+   if year = '2003' and educ = 12 then educ = 3;
+run;
+proc freq data=huffeduc;
+   where age ge 25;
+   tables educ/missing;
+   format educ educ.;
+run;
+proc freq data=sm.huffdeaths;
+   where age ge 18;
+   tables occ_sam/missing;
+   format occ_sam $occclass.;
+run;
+
+/*
+results:
+
+              10:50 Thursday, February 6, 2014 161
+                                  Results for state
+
+                                  The FREQ Procedure
+
+                                       Education
+
+                                                           Cumulative    Cumulative
+                          EDUC    Frequency     Percent     Frequency      Percent
+   --------------------------------------------------------------------------------
+   Unknown (09 or 99)                    3        6.82             3         6.82
+   9th-12th grade, no diploma            3        6.82             6        13.64
+   High school graduate or GED          18       40.91            24        54.55
+   Some college                         11       25.00            35        79.55
+   Bachelor's degree                     5       11.36            40        90.91
+   Postgraduate degree                   4        9.09            44       100.00
+
+
+
+  The SAS System                                  09:41 Friday, January 31, 2014  14
+
+                                               11:19 Wednesday, February 5, 2014
+
+                               The FREQ Procedure
+
+                            Occupation - Sam Milham
+
+                                                        Cumulative    Cumulative
+OCC_SAM                        Frequency     Percent     Frequency      Percent
+--------------------------------------------------------------------------------
+professional/technical               15       28.85            24        46.15
+manager/proprietor/official           2        3.85            26        50.00
+clerical                              2        3.85            28        53.85
+sales                                 2        3.85            30        57.69
+craftsmen/foremen/kindred             6       11.54            36        69.23
+operatives                            2        3.85            38        73.08
+service workers                       6       11.54            44        84.62
+laborers                              8       15.38            52       100.00
+other                                 9       17.31             9        17.31
+*/
+
+\end{lstlisting}
+
+{\bf Rural/urban classification}
+
+According to this page on the OFM website (\url{http://www.ofm.wa.gov/pop/popden/rural.asp}, accessed on Jan 31, 2014),
+counties are defined by the RCW as rural if they have a population density of less than 100 persons per square mile or are smaller then 225 square miles. According to a list on that web page, the rural counties as of April 1, 2013 were:
+
+\bvm	 
+'01'  Adams
+'02'  Asotin
+'04'  Chelan
+'05'  Clallam
+'07'  Columbia
+'08'  Cowlitz
+'09'  Douglas
+'10'  Ferry
+'11'  Franklin
+'12'  Garfield
+'13'  Grant
+'14'  Grays Harbor
+'15'  Island
+'16'  Jefferson
+'19'  Kittitas
+'20'  Klickitat
+'21'  Lewis
+'22'  Lincoln
+'23'  Mason
+'24'  Okanogan
+'25'  Pacific
+'26'  Pend Oreille
+'28'  San Juan
+'29'  Skagit
+'30'  Skamania
+'33'  Stevens
+'35'  Wahkiakum
+'36'  Walla Walla
+'37'  Whatcom
+'38'  Whitman
+'39'  Yakima
+\end{verbatim}
+
+\begin{lstlisting}[language=sas,caption=rural/urban]
+proc format;
+   value $rururb
+      '01','02','04','05','07','08','09','10','11','12','13',
+      '14','15','16','19','20','21','22','23','24','25','26',
+      '28','29','30','33','35','36','37','38','39'              = 'Rural'
+      '03','06','17','18','27','31','32','34'                   = 'Urban'
+      '00'                                                      = 'out-of-state'
+      ;
+run;
+proc freq data=sm.huffdeaths;
+   tables cnty_res;
+   format cnty_res $rururb.;
+run;
+/*
+results:
+
+ The SAS System                                  09:41 Friday, January 31, 2014  17
+
+                          The FREQ Procedure
+
+                         Residence - county
+
+                                           Cumulative    Cumulative
+  CNTY_RES        Frequency     Percent     Frequency      Percent
+  -----------------------------------------------------------------
+  out-of-state           2        3.57             2         3.57
+  Rural                 13       23.21            15        26.79
+  Urban                 41       73.21            56       100.00
+
+\end{lstlisting}
+
+\subsection{Tabulate unintentional poisoning deaths}
+
+For comparison to the huffing deaths, I will tabulate some of the demographic features of the deaths to unintentional poisoning (X40--X49) occurring in Washington during 2003--2012. The items I will tabulate are sex, age, race (white vs all other) educational attainment (age 25+), occupational class (age 18+), urban/rural, year of death.
+
+\begin{lstlisting}[language=sas,caption=tabulate unintentional poisonings]
+data poison;
+   set death.dea2003 death.dea2004 death.dea2005 death.dea2006 death.dea2007 death.dea2008
+       death.dea2009 death.dea2010 death.dea2011 death.dea2012;
+   where st_occ = '48' and 'X40' le underly3 le 'X49';
+   if dth_yr = '2003' then 
+      select;
+         when(0 le educ le 8)   educ = 1;
+         when(9 le educ le 11)  educ = 2;
+         when(educ = 12)        educ = 3;
+         when(13 le educ le 15) educ = 4;
+         when(educ = 16)        educ = 6;
+         when(educ = 17)        educ = 7;
+         otherwise              educ = 9;
+         end;
+run;
+
+options ls=80;
+proc freq data=poison;
+   tables sex age race cnty_res dth_yr;
+   format age ageten. race $white. educ educ. cnty_res $rururb.;
+run;
+
+proc freq data=poison;
+   where age ge 25;
+   tables educ/missing;
+   format educ educ.;
+run;
+proc freq data=poison;
+   where age ge 18;
+   tables occ_sam/missing;
+   format occ_sam $occclass.;
+run;
+\end{lstlisting}
+
+\bfs
+\bvm
+                    unintentional poisoning deaths 2003-2012                  60
+                                               11:19 Wednesday, February 5, 2014
+
+                               The FREQ Procedure
+
+                                      Sex
+
+                                            Cumulative    Cumulative
+            SEX    Frequency     Percent     Frequency      Percent
+            --------------------------------------------------------
+            F          2931       38.20          2931        38.20
+            M          4742       61.80          7673       100.00
+
+
+                                  Age in years
+
+                                             Cumulative    Cumulative
+             AGE    Frequency     Percent     Frequency      Percent
+           ----------------------------------------------------------
+            0-9           11        0.14            11         0.14
+           10-19         173        2.25           184         2.40
+           20-29        1080       14.08          1264        16.47
+           30-39        1415       18.44          2679        34.91
+           40-49        2376       30.97          5055        65.88
+           50-59        1965       25.61          7020        91.49
+           60+           653        8.51          7673       100.00
+
+
+                                      Race
+
+                                               Cumulative    Cumulative
+         RACE         Frequency     Percent     Frequency      Percent
+         --------------------------------------------------------------
+         white            6658       86.77          6658        86.77
+         all other        1015       13.23          7673       100.00
+
+
+                              Residence - county
+
+                                                Cumulative    Cumulative
+       CNTY_RES        Frequency     Percent     Frequency      Percent
+       -----------------------------------------------------------------
+       out-of-state         275        3.58           275         3.58
+       Rural               1814       23.64          2089        27.23
+       Urban               5584       72.77          7673       100.00
+
+
+                                 The SAS System                                1
+                                                17:06 Thursday, February 6, 2014
+
+                               The FREQ Procedure
+
+                                 Year of death
+
+                                             Cumulative    Cumulative
+          DTH_YR    Frequency     Percent     Frequency      Percent
+          -----------------------------------------------------------
+          2003           539        7.02           539         7.02
+          2004           640        8.34          1179        15.37
+          2005           692        9.02          1871        24.38
+          2006           762        9.93          2633        34.32
+          2007           819       10.67          3452        44.99
+          2008           859       11.20          4311        56.18
+          2009           874       11.39          5185        67.57
+          2010           778       10.14          5963        77.71
+          2011           853       11.12          6816        88.83
+          2012           857       11.17          7673       100.00
+
+
+                    unintentional poisoning deaths 2003-2012                  61
+                                               11:19 Wednesday, February 5, 2014
+
+                               The FREQ Procedure
+
+                                    Education
+
+                                                        Cumulative    Cumulative
+                       EDUC    Frequency     Percent     Frequency      Percent
+--------------------------------------------------------------------------------
+Unknown (09 or 99)                  278        3.95           278         3.95
+8th grade or less                   229        3.25           507         7.20
+9th-12th grade, no diploma         1097       15.58          1604        22.78
+High school graduate or GED        3010       42.76          4614        65.54
+Some college                       1829       25.98          6443        91.52
+Bachelor's degree                   445        6.32          6888        97.84
+Postgraduate degree                 152        2.16          7040       100.00
+
+
+                    unintentional poisoning deaths 2003-2012                  62
+                                               11:19 Wednesday, February 5, 2014
+
+                               The FREQ Procedure
+
+                            Occupation - Sam Milham
+
+                                                        Cumulative    Cumulative
+OCC_SAM                        Frequency     Percent     Frequency      Percent
+--------------------------------------------------------------------------------
+professional/technical             1019       13.42          2721        35.85
+farmer                               27        0.36          2748        36.20
+manager/proprietor/official         305        4.02          3053        40.22
+clerical                            392        5.16          3445        45.38
+sales                               366        4.82          3811        50.20
+craftsmen/foremen/kindred          1409       18.56          5220        68.77
+operatives                          515        6.78          5735        75.55
+service workers                    1053       13.87          6788        89.42
+laborers                            803       10.58          7591       100.00
+other                              1702       22.42          1702        22.42
+
+\end{verbatim}
+\efs
+
+Median ages:
+
+\begin{lstlisting}[language=sas,caption=compute median age of huffing and drug poisoning deaths]
+proc univariate data=sm.huffdeaths;
+   var age;
+run;
+proc univariate data=poison;
+   var age;
+run;
+
+\end{lstlisting}
+
+\bfs
+\bvm
+                                     huffing deaths                                 10:36 Monday, February 24, 2014 156
+
+                                The UNIVARIATE Procedure
+                             Variable:  AGE  (Age in years)
+
+                                        Moments
+
+            N                          56    Sum Weights                 56
+            Mean               36.2857143    Sum Observations          2032
+            Std Deviation      12.1186772    Variance            146.862338
+            Skewness           -0.0691884    Kurtosis            -0.7682772
+            Uncorrected SS          81810    Corrected SS        8077.42857
+            Coeff Variation    33.3979294    Std Error Mean      1.61942636
+
+
+                               Basic Statistical Measures
+
+                     Location                    Variability
+
+                 Mean     36.28571     Std Deviation           12.11868
+                 Median   36.00000     Variance               146.86234
+                 Mode     29.00000     Range                   50.00000
+                                       Interquartile Range     18.00000
+
+
+                               Tests for Location: Mu0=0
+
+                    Test           -Statistic-    -----p Value------
+
+                    Student's t    t  22.40652    Pr > |t|    <.0001
+                    Sign           M        28    Pr >= |M|   <.0001
+                    Signed Rank    S       798    Pr >= |S|   <.0001
+
+
+                               Quantiles (Definition 5)
+
+                             95% Confidence Limits    -------Order Statistics-------
+   Quantile      Estimate      Distribution Free      LCL Rank  UCL Rank    Coverage
+
+   100% Max            63
+   99%                 63     56                63          54        56       41.17
+   95%                 56     51                63          50        56       92.23
+   90%                 51     46                56          46        55       95.88
+   75% Q3              45     43                50          36        49       95.68
+   50% Median          36     33                43          21        36       95.60
+   25% Q1              27     22                33           8        21       95.68
+   10%                 20     15                23           2        11       95.88
+   5%                  15     13                21           1         7       92.23
+   1%                  13     13                15           1         3       41.17
+   0% Min              13
+
+
+                                  Extreme Observations
+
+                          ----Lowest----        ----Highest---
+
+                          Value      Obs        Value      Obs
+
+                             13       37           51       39
+                             15       24           55       49
+                             15       11           56        2
+                             16       14           56       15
+                             18       12           63       55
+
+
+
+    unintentional poisoning deaths                         10:36 Monday, February 24, 2014 157
+
+                                The UNIVARIATE Procedure
+                             Variable:  AGE  (Age in years)
+
+                                        Moments
+
+            N                        7673    Sum Weights               7673
+            Mean               43.8025544    Sum Observations        336097
+            Std Deviation      13.0267325    Variance             169.69576
+            Skewness           0.10820145    Kurtosis            0.31117342
+            Uncorrected SS       16023813    Corrected SS        1301905.87
+            Coeff Variation     29.739664    Std Error Mean      0.14871436
+
+
+                               Basic Statistical Measures
+
+                     Location                    Variability
+
+                 Mean     43.80255     Std Deviation           13.02673
+                 Median   45.00000     Variance               169.69576
+                 Mode     49.00000     Range                   98.00000
+                                       Interquartile Range     17.00000
+
+
+                               Tests for Location: Mu0=0
+
+                    Test           -Statistic-    -----p Value------
+
+                    Student's t    t  294.5415    Pr > |t|    <.0001
+                    Sign           M      3836    Pr >= |M|   <.0001
+                    Signed Rank    S  14716814    Pr >= |S|   <.0001
+
+
+                               Quantiles (Definition 5)
+
+                             95% Confidence Limits    -------Order Statistics-------
+   Quantile      Estimate      Distribution Free      LCL Rank  UCL Rank    Coverage
+
+   100% Max            98
+   99%                 80     77                82        7579      7614       95.57
+   95%                 63     62                64        7252      7327       95.06
+   90%                 59     58                59        6855      6959       95.21
+   75% Q3              52     52                53        5681      5830       95.05
+   50% Median          45     45                45        3751      3923       95.04
+   25% Q1              35     34                35        1844      1993       95.05
+   10%                 26     25                26         715       819       95.21
+   5%                  22     22                22         347       422       95.06
+   1%                  17     17                18          60        95       95.57
+   0% Min               0
+
+
+                                  Extreme Observations
+
+                          ----Lowest----        ----Highest---
+
+                          Value      Obs        Value      Obs
+
+                              0     3336           93     5161
+                              1     7013           94     1768
+                              1     5404           96     1583
+                              1     3625           97     3238
+                              1     1075           98     4694
+
+\end{verbatim}
+\efs
+
+\end{detail}
+
+A total of 476,002 deaths occurred in Washington State during 2003--2012. We found 56 deaths that were either certainly or probably associated with VSM (\autoref{caselist}). Decedents were mostly male (87.5\%), white (92.9\%), and age 20 or older (91.1\%) (\autoref{counts2}). The median age for VSM deaths was 36 years (95\% CI 33--43 years). Nearly all decedents (93.2\%) had at least a high school education, and more than half (53.3\%) had at least some college. Most of the deaths (73.2\%) were to urban residents.
+
+In 40 of the 56 VSM-associated deaths, the inhalation of a volatile substance and the sequelae of its use, such as cardiac arrythmia or asphyxia, were the only causes of death mentioned (\autoref{caselist}). The other 16 deaths included mention of a disease condition, trauma following VSM, or VSM with other drugs or alcohol. Three of the deaths were certified as being due to heart disease, 2 to drug dependence (a disease category), 45 to unintentional poisoning, 4 to some other unintentional injury (1 motor vehicle crash, 1 fall, 1 suffocation, and 1 ``unspecified breathing threat''). One person drowned after inhaling difluoroethane, but her death was coded as being due to poisoning. Two deaths were coded as poisoning of undetermined intent. Among the deaths coded as being due to unintentional poisoning, a variety of specific codes were used. Deaths involving difluoroethane by itself were variously coded as poisoning by drugs, `other gases,' `organic solvents,' `other substance,' or `pesticides,' demonstrating that the cause-of-death ICD codes cannot be used to identify these deaths. 
+
+Difluoroethane was named on 30 (54\%) of the 56 death certificates. The second most frequently named substance was chloroethane (also called ethyl chloride), which was named on 6 certificates (\autoref{chemlist}). Difluoroethane was named alone, without other drugs or alcohol, on 24 certificates (3 of these involved a traumatic death after difluoroethane use). 
+
+On 14 death certificates, the decedents were said to have used a dust cleaner product, variously described as Dust-Off, gas duster, dust destroyer, dust remover, computer keyboard cleaner, canned air, or compressed air. Twelve of these certificates named difluoroethane (one named dichloromethane, and one did not name a chemical). None of the 18 other certificates that named difluoroethane named a source for it, and it is possible that many of those decedents also used a dust cleaner product.
+
+The frequency of VSM-associated deaths increased during the study period (\autoref{huffcounts}). There were 25 deaths during 2003--2009 (3.6/year), and 31 deaths during 2010--2012 (10.3/year). Difluoroethane was mentioned on 8 of 25 certificates (32\%) during 2003--2008, compared to 22 of 31 certificates (71\%) during 2010--2012.
+
+
+
+\begin{figure}
+<<huffcounts,echo=F,fig=T,height=4,width=6>>=
+huffdeaths <- read.table('c:/user/poisoning/supermicar/analysis/huffcount.dat',header=T)
+with(huffdeaths,plot(year,deaths,type='o',las=1,xlab='Year',ylab='Number of deaths',ylim=c(0,15)))
+#with(huffdeaths,points(year,difl,col=2))
+#with(huffdeaths,lines(year,difl,col=2))
+#with(huffdeaths,points(year,notdifl,col=4))
+#with(huffdeaths,lines(year,notdifl,col=4))
+@
+\caption{\label{huffcounts}Number of VSM-associated deaths per year, Washington State, 2003--2012.}
+\end{figure}
+
+\begin{detail}
+\begin{table}
+\begin{minipage}{1.0\textwidth}
+\small
+\caption{\label{counts1}Deaths associated with volatile substance misuse, compared to unintentional drug poisoning deaths, Washington State, 2003--2012.}
+\begin{tabular}{llrrrr} \hline
+ && && \multicolumn{2}{c}{Unintentional drug} \\
+ && \multicolumn{2}{c}{VSM deaths} & \multicolumn{2}{c}{poisoning deaths} \\ \hline
+\multicolumn{2}{l}{Characteristic} & N  & \%   & N & \% \\ \hline
+\multicolumn{2}{l}{Total}          & 56 &      & 7,673 & \\ [.5em]
+\multicolumn{2}{l}{Sex}            &    &      & & \\
+& male                             & 49 & 87.5 &4,742 & 61.8 \\
+& female                           &  7 & 12.5 &2,931 & 38.2 \\ [.5em]
+\multicolumn{2}{l}{Age}            &    &      & & \\
+&  0-9                             &    &      &  11  &  0.1 \\
+& 10-19                            &  5 &  8.9 &  173 &  2.3 \\ 
+& 20-29                            & 14 & 25.0 &1,080 & 14.1 \\ 
+& 30-39                            & 12 & 21.4 &1,415 & 18.4 \\ 
+& 40-49                            & 16 & 28.6 &2,376 & 31.0 \\
+& 50-59                            &  8 & 14.3 &1,965 & 25.6 \\ 
+& 60+                              &  1 &  1.8 &  653 &  8.5 \\ [.5em]
+\multicolumn{2}{l}{Race}           &    &      &      & \\
+& white                            & 52 & 92.9 & 6,658& 86.8 \\ 
+& all other                        &  4 &  7.1 & 1,015& 13.2 \\ [.5em]
+\multicolumn{2}{l}{Education}      &    &      & & \\
+\multicolumn{6}{l}{(among decedents age 25 and older)}       \\
+& 8th grade or less                &  0 &   0.0 &   229  &  3.3  \\
+& 9th-12th grade, no diploma       &  3 &   6.8 & 1,097  & 15.6  \\
+& High school graduate or GED      & 18 &  40.9 & 3,010  & 42.8  \\
+& Some college                     & 11 &  25.0 & 1,829  & 26.0  \\
+& Bachelor's degree                &  5 &  11.4 &   445  &  6.3   \\
+& Postgraduate degree              &  4 &   9.1 &   152  &  2.2  \\
+& Unknown (09 or 99)               &  3 &   6.8 &   278  &  4.0  \\ [.5em]
+\multicolumn{2}{l}{Occupational class}      &    &      & & \\
+\multicolumn{6}{l}{(among decedents age 18 and older)}       \\
+& professional/technical        &  15 &  28.9 & 1,019 &  13.4 \\
+& farmer                        &   0 &   0.0 &    27 &   0.4 \\
+& manager/proprietor/official   &   2 &   3.9 &   305 &   4.0 \\
+& clerical                      &   2 &   3.9 &   392 &   5.2 \\
+& sales                         &   2 &   3.9 &   366 &   4.8 \\
+& craftsmen/foremen/kindred     &   6 &  11.5 & 1,409 &  18.6 \\
+& operatives                    &   2 &   3.9 &   515 &   6.8 \\
+& service workers               &   6 &  11.5 & 1,053 &  13.9 \\
+& laborers                      &   8 &  15.4 &   803 &  10.6 \\
+& other                         &   9 &  17.3 & 1,702 &  22.4 \\ [.5em]
+\multicolumn{2}{l}{Rural/urban county} &    &      &      & \\
+& Rural           &  13 &      23.2 &   1,814  &     23.6 \\
+& Urban           &  41 &      73.2 &   5,584  &     72.8 \\ 
+& out-of-state    &   2 &       3.6 &     275  &      3.6 \\ [.5em]
+
+\multicolumn{2}{l}{Underlying cause of death} & & \\
+& drug use/dependence        &  2 & 3.6 \\
+& other disease              &  3 & 5.4 \\
+& unintentional poisoning    & 45 &80.4 \\
+& other unintentional injury &  4 & 7.1 \\
+& undetermined intent        &  2 & 3.6 \\ [.5em]
+\hline
+\end{tabular}
+\end{minipage}
+\end{table}
+\end{detail}
+
+\begin{table}
+\begin{minipage}{0.5\textwidth}
+\small
+\caption{\label{counts2}Deaths associated with volatile substance misuse, Washington State, 2003--2012.}
+\begin{tabular}{llrr} \hline
+\multicolumn{2}{l}{Characteristic} & N  & \%   \\ \hline
+\multicolumn{2}{l}{Total}          & 56 &      \\ [.5em]
+\multicolumn{2}{l}{Sex}            &    &      \\
+& male                             & 49 & 87.5 \\
+& female                           &  7 & 12.5 \\ [.5em]
+\multicolumn{2}{l}{Age}            &    &      \\
+& 10-19                            &  5 &  8.9 \\ 
+& 20-29                            & 14 & 25.0 \\ 
+& 30-39                            & 12 & 21.4 \\ 
+& 40-49                            & 16 & 28.6 \\
+& 50-59                            &  8 & 14.3 \\ 
+& 60+                              &  1 &  1.8 \\ [.5em]
+\multicolumn{2}{l}{Race}           &    &      \\
+& white                            & 52 & 92.9 \\ 
+& all other                        &  4 &  7.1 \\ [.5em]
+\multicolumn{2}{l}{Education}      &    &      \\
+\multicolumn{4}{l}{(among decedents age 25 and older)}       \\
+& 8th grade or less                &  0 &   0.0 \\
+& 9th-12th grade, no diploma       &  3 &   6.8 \\
+& High school graduate or GED      & 18 &  40.9 \\
+& Some college                     & 11 &  25.0 \\
+& Bachelor's degree                &  5 &  11.4  \\
+& Postgraduate degree              &  4 &   9.1 \\
+& Unknown (09 or 99)               &  3 &   6.8 \\ [.5em]
+\multicolumn{2}{l}{Rural/urban county} &    &   \\
+& Rural           &  13 &      23.2 \\
+& Urban           &  41 &      73.2 \\ 
+& out-of-state    &   2 &       3.6 \\ [.5em]
+\multicolumn{2}{l}{Underlying cause of death} & & \\
+& drug use/dependence        &  2 & 3.6 \\
+& other disease              &  3 & 5.4 \\
+& unintentional poisoning    & 45 &80.4 \\
+& other unintentional injury &  4 & 7.1 \\
+& undetermined intent        &  2 & 3.6 \\ [.5em]
+\hline
+\end{tabular}
+\end{minipage}
+\end{table}
+
+\begin{table}
+\begin{minipage}{0.6\textwidth}
+\caption{\label{chemlist}Chemicals named on VSM-associated death certificates.$^\dag$}
+\begin{tabular}{lr} \hline
+Chemical                                         & count \\ \hline
+difluoroethane                                     & 30 \\
+chloroethane (ethyl chloride)                      &  6 \\
+aerosol fumes/canned air, not otherwise specified  &  4 \\
+nitrous oxide                                      &  3 \\
+butane                                             &  2 \\
+toluene                                            &  2 \\
+inhalant abuse or use, no chemical mentioned       &  2 \\
+amyl nitrate                                       &  1 \\
+dichloromethane                                    &  1 \\
+difluoroethene                                     &  1 \\
+difluoromethane                                    &  1 \\
+gasoline                                           &  1 \\
+helium                                             &  1 \\
+propane                                            &  1 \\
+hydrocarbons, not otherwise specified              &  1 \\
+\hline
+\end{tabular}
+$^\dag$One certificate mentioned both difluoroethane and chloroethane.
+\end{minipage}
+\end{table}
+
+\begin{table}
+\caption{\label{caselist}\small List of all VSM-associated deaths that occurred in Washington State, 2003--2012.}
+\begin{scriptsize}
+\begin{tabular}{lrrl@{\ }p{1.5in}>{\RaggedRight}p{3.5in}}
+\hline
+year & age & sex & \multicolumn{2}{l}{official underlying cause} & certifier's description (summarized) \\ \hline
+2003 & 41 & M & X44  & drug poisoning   & asphyxia due to nitrous oxide inhalation \\
+2004 & 56 & M & F19.1& drug use         & pulmonary fibrosis/interstitial pneumonitis due to illicit inhaled substance abuse \\ 
+2004 & 26 & M & X47  & poisoning, other gases & asphyxia due to inhalation of difluoroethane \\
+2004 & 44 & M & Y20  & suffocation, undetermined intent  & asphyxia/plastic bag over head/combined effects of methamphetamine, difluoroethane, and ethyl chloride \\
+2004 & 51 & M & I25.1& heart disease    & atherosclerotic heart disease; heavy dose of inhaled hydrocarbons \\
+2004 & 20 & M & X49  & poisoning, other substance  & inhalation of difluoroethane; Dust-Off \\
+2005 & 28 & M & X44  & drug poisoning  & nitrous oxide and morphine, valium, and sertraline \\
+2005 & 33 & M & X44  & drug poisoning  & asphyxia from recreational inhalation of ethyl chloride \\
+2005 & 29 & M & F10.1& alcohol use     & acute alcohol and difluoroethane (Dust-Off) intoxication \\
+2006 & 43 & M & I25.0& heart disease   & atherosclerotic coronary disease and butane vapor toxicity \\
+2006 & 15 & M & X47  & poisoning, other gases & huffing of gasoline vapor \\
+2006 & 18 & M & X47  & poisoning, other gases & inhaled butane \\ 
+2006 & 33 & M & X46  & poisoning, organic solvents & huffing difluoroethene \\
+2007 & 16 & F & X46  & poisoning, organic solvents & inhaled difluoroethane (Dust-Off) and drowned in hot tub \\
+2007 & 56 & M & X46  & poisoning, organic solvents & asphyxia due to inhalation of volatile solvents including toluene \\
+2007 & 22 & M & X46  & poisoning, organic solvents & ethanol and difluoromethane intoxication \\
+2008 & 34 & M & X46  & poisoning, organic solvents & ethanol and difluoroethane intoxication \\
+2008 & 50 & M & X46  & poisoning, organic solvents & difluoroethane poisoning/inhalation of propellant from canned air \\
+2008 & 36 & M & X44  & drug poisoning & combined chloroethane and ethanol intoxication \\
+2008 & 36 & M & W83  & unspecified breathing threat & asphyxia/plastic bag over head/inhalation of nitrous oxide \\
+2008 & 42 & M & X44  & drug poisoning & asphyxia/ethyl chloride with gas mask over head \\
+2008 & 41 & M & I49.9& heart disease & cardiac dysrhythmia associated with amyl nitrate inhalation abuse/ethanol intoxication \\
+2009 & 50 & M & X44  & drug poisoning  & inhalant abuse of ethyl chloride-containing solvent \\
+2009 & 15 & F & W80  & inhalation foreign object & asphyxia/huffing from aerosol can \\
+2009 & 45 & M & X44  & drug poisoning  & oxycodone and difluoroethane intoxication/inhalant abuse \\
+2010 & 23 & M & X46  & poisoning, organic solvents  & positional asphyxia/1,1-difluoroethane (dynex compressed gas duster) \\
+2010 & 21 & M & X47  & poisoning, other gases & asphyxia/propane inhalation and plastic bag over head \\
+2010 & 46 & M & X48  & poisoning, pesticides  & cardiac dysrhythmia/inhalation of difluroethane/dust destroyer \\
+2010 & 36 & F & X48  & poisoning, pesticides  & difluoroethane poisoning/huffing dust remover \\
+2010 & 51 & M & Y19  & poisoning, undetermined intent  & asphyxia from inhaling fumes from aerosol cans (whipped cream) \\
+2010 & 44 & M & X43  & drug poisoning  & asphyxia due to inhalation of difluorethane \\
+2010 & 34 & M & X47  & poisoning, other gases & acute difluoroethane intoxication \\
+2010 & 34 & M & X41  & drug poisoning  & chlordiazepoxide and nordiazepam/huffing canned air (dichloromethane) \\
+2010 & 39 & F & X48  & poisoning, pesticides & asphyxia/inhalation of difluoroethane/aerosol dust remover \\
+2010 & 35 & F & X46  & poisoning, organic solvents  & inhaled chemicals containing toluene \\
+2010 & 29 & M & X44  & drug poisoning  & difluoroethane intoxication/inhalant abuse \\
+2010 & 13 & M & X48  & poisoning, pesticides  & cardiotoxicity/aerosol inhalant abuse (difluoroethane)/huffing canned air \\
+2010 & 46 & M & X49  & poisoning, other substance & asphyxia/huffing aerosol from compressed air can \\
+2010 & 51 & M & X44  & drug poisoning  & tramadol and possible inhalant intoxication \\
+2010 & 29 & M & X49  & poisoning, other substance  & cardiac dysrhythmia/difluoroethane/huffing computer keyboard cleaner \\
+2011 & 23 & M & X44  & drug poisoning & asphyxiation/plastic bag over head, connected to helium tank \\
+2011 & 46 & F & X47  & poisoning, other gases & difluorethane poisoning/huffed inhalant \\
+2011 & 43 & M & X47  & poisoning, other gases & difluoroethane intoxication/inhalant abuse \\
+2011 & 45 & M & W18  & fall & acute subdural hematoma/head injury/fell while huffing difluoroethane \\
+2011 & 22 & M & X44  & drug poisoning & combined effects of difluoroethane, doxylamine, diphenhydramine, trazodone, citalopram, hydrocodone, and ethanol \\
+2011 & 45 & M & X47  & poisoning, other gases & difluoroethane intoxication/inhalant abuse \\
+2012 & 29 & M & X47  & poisoning, other gases & difluoroethane poisoning/inhalation of compressed air duster \\
+2012 & 40 & M & X44  & drug poisoning & cardiac arrhythmia/inhalant abuse of difluoroethane/Dust-Off \\
+2012 & 55 & M & X47  & poisoning, other gases & inhaled difluoroethane \\
+2012 & 33 & M & V47.5& motor vehicle accident & multiple blunt force injuries/huffing difluoroethane/driver, single vehicle accident \\
+2012 & 44 & F & X47  & poisoning, other gases & difluoroethane intoxication/inhalant abuse \\
+2012 & 49 & M & X44  & drug poisoning & chloroethane intoxication/inhalant abuse \\
+2012 & 35 & M & X47  & poisoning, other gases & difluoroethane intoxication/huffing \\
+2012 & 25 & M & X44  & drug poisoning & combined effects of ethanol, difluoroethane, diazepam, oxazepam, temazepam \\
+2012 & 63 & M & X49  & poisoning, other substance & cardiac arrhythmia/inhalation of aerosol fumes \\
+2012 & 24 & M & X47  & poisoning, other gases & difluoroethane intoxication/inhalant abuse with plastic bag over head \\
+\hline
+\end{tabular}
+\end{scriptsize}
+\end{table}
+
+
+\clearpage
+
+\section{Discussion}
+
+We found that VSM was associated with 56 deaths in Washington State between 2003 and 2012. Since the ICD does not have a code for VSM as a cause-of-death we could not tabulate the number of deaths for which VSM was named as the underlying cause, however, in most of these deaths no other cause than VSM was mentioned on the death certificate. Most of the deaths were among adult white males.
+
+Fourteen of the certificates mentioned the use of a gas duster product, and 12 of these named difluoroethane on the certificate. These products are often colloquially called ``canned air'' or ``compressed air,'' which gives the false impression that they are harmless. In fact, because air is difficult to compress into a liquid, they normally contain other gases. Difluoroethane is used in many gas dusters, but other gases may also be used. The use of gas dusters for VSM has been widely known, and, according to their advertising claims, many manufacturers add a bitterant to the product to discourage VSM. Only 4 of the death certificates in the present study identified the gas duster product that was used, and both of the named products claim to contain a bitterant. Ten other certificates that named difluoroethane mentioned the use of a gas duster, but did not name the brand. The other 16 certificates on which difluoroethane was named did not name the source (difluoroethane is also used as a refrigerant). Therefore, we cannot tell whether decedents used gas dusters despite the presence of bitterants, or if they were able to find difluoroethane that did not contain bitterants.
+
+There have been 3 previous state-wide studies of VSM deaths, in Virginia~\cite{Bowen-1999}, Texas~\cite{Maxwell-2001}, and North Carolina~\cite{Hall-2010}. In the Virginia study, which included 39 deaths accurring between 1987 and 1996, difluoroethane was not named as being involved in any of the deaths. The Texas report, which included 144 VSM deaths occurring between 1988 and 1998, did not mention difluoroethane, but it is possible that it was involved in some of the 51 deaths in which Freon was named (difluoroethane is also known as Freon 152a). In the North Carolina study, which included 30 VSM deaths occurring between 2000 and 2008, difluoroethane was named on 6 deaths. In the Washington State deaths we report, the prevalence of difluoroethane involvement increased during the study period, from 8 of 25 deaths during 2003--2008, to 22 of 31 deaths during 2010--2012. Together, these 4 studies suggest that difluoroethane involvement in VSM deaths is increasing. An analysis of reports to Poison Control Centers showed that among reports involving inhalants, the proportion in which the substance inhaled was a propellant increased increased from about 6\% in 2000 to about 31\% in 2008, while the proportions for all the other 5 leading categories (gasoline, paint, other hydrocarbons, and asphyxiants) decreased during that period~\cite{Marsolek-2010}. Other reports have also raised the concern that the use of gas dusters for VSM is increasing~\cite{Garland-2011}.
+
+The 4 statewide studies also suggest a secular increase in the age of the decedents. In Virginia (years 1987--1996) the median age of decedents was 19 years~\cite{Bowen-1999}, in Texas (years 1988--1998) the median age was 26 years~\cite{Maxwell-2001}, in North Carolina (years 2000--2008), it was 28 years~\cite{Hall-2010}, and in the present study (years 2003--2012), it was 36 years. All of the studies reported that VSM deaths occurred predominantly among white males.
+
+\begin{detail}
+In the Texas study, 18 out of the 144 deaths were among people employed as refrigeration or HVAC workers or as automobile mechanics, and who died after inhaling Freon, suggesting that those workers were more likely to use Freon because it was easily available to them~\cite{Maxwell-2001}. In contrast, there were no deaths in our study among those occupations, and no deaths involving any type of Freon that is not commonly available in gas duster products.
+\end{detail}
+
+Most studies of VSM focus on adolescents because, according to surveys, VSM use is much higher among adolescents than among adults~\cite{Howard-2011,Marsolek-2010,Williams-2007}.
+In the 2011 National Survey on Drug Use and Health the reported use of inhalants during the past 30 days was 0.9\% among youth age 12--17, 0.4\% among young adults age 18--25, and 0.1\% among adults age 26 and over~\cite{SAMHSA-2011}. In the Monitoring the Future survey, the reported past 30 day use was higher among youths (2.1\% among grades 8/10/12 combined in 2011), but similar in the older age groups~\cite{Johnston-2013a}. In both surveys, the reported past 30 day use of inhalants decreased between 2003 and 2011 in all age groups. These findings, together with the patterns among VSM deaths, suggest that although more adolescents than adults engage in VSM, there may be a small group of adults who are heavy users, and who are at high risk of death from their use of inhalants.
+
+Reports to Poison Control Centers show that many different substances are used for VSM. In an analysis of reports received between 2000 and 2008, more than 200 `inhalant product categories,' which included more than 3,410 different inhalant products, were reported. This has implications for prevention, because if one product or substance is altered to become unpalatable for VSM, users may simply adopt the use of a different substance. Marketing information for gas dusters shows that most brands claim to contain a bitterant, but a review of internet blogs and comments shows that even some people not involved in VSM actively look for gas dusters that do not contain bitterants, either because they think the bitterants leave a residue on electronic components, or because, during normal use, some bitterant may end up in the mouth and leave an undesirable taste. This raises the possibility that manufacturers who add bitterant or increase the strength of bitterant in their product may lose customers.
+
+Our study has several limitations. There is no ICD coding for VSM, and no formal way to attribute the underlying cause-of-death to VSM. Therefore, we counted every death for which VSM was mentioned on the death certificate as a VSM-associated death, and did not attempt to ascertain in which deaths VSM was only a contributory cause. For a few deaths it was not clear from the death certificate wording whether the decedent inhaled a volatile substance to get high, or whether the inhalation was incidental to another activity (such as using spray paint in an enclosed space), and we had to make a judgement whether to count the death as VSM-associated or not. Some inhalants, particularly difluoroethane, may cause a cardiac arrest that occurs several minutes to a few hours after inhalant use has stopped~\cite{Bowen-2011,Avella-2006}. In some of those cases, the cause-of-death certifier may not have been aware of the inhalant use, and thus not noted it on the death certificate. Because of the limited information that certifiers entered on death certificates, for most of the deaths we could not describe the source or product used for the inhalant.
+
+\subsection{Conclusion}
+
+The number of VSM deaths, and the number and proportion of VSM deaths that involved difluoroethane increased in Washington State during 2003--2012. In contrast to surveys, which show higher VSM use among teens, most VSM deaths in Washington occurred among adults. Our data, together with results from other states, suggest that the age of VSM-associated deaths has increased, and that the contribution of gas duster products, particularly those containing difluoroethane, has increased.
